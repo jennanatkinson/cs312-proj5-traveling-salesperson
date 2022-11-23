@@ -30,7 +30,7 @@ from TSPClasses import *
 
 
 class PointLineView( QWidget ):
-	def __init__( self, status_bar, data_range ):
+	def __init__( self, status_bar=None, data_range=None ):
 		super(QWidget,self).__init__()
 		self.setMinimumSize(950,600)
 
@@ -110,9 +110,9 @@ class PointLineView( QWidget ):
 		h = self.height()
 		w2h_desired_ratio = (xr[1]-xr[0])/(yr[1]-yr[0])
 		if w / h < w2h_desired_ratio:
-			 scale = w / (xr[1]-xr[0])
+			scale = w / (xr[1]-xr[0])
 		else:
-			 scale = h / (yr[1]-yr[0])
+			scale = h / (yr[1]-yr[0])
 
 		tform = QTransform()
 		tform.translate(self.width()/2.0,self.height()/2.0)
@@ -309,7 +309,7 @@ class Proj5GUI( QMainWindow ):
 			self.numSolutions.setText( '{}'.format(results['count']) )
 			self.tourCost.setText( '{}'.format(results['cost']) )
 			self.solvedIn.setText( '{:6.6f} seconds'.format(results['time']) )
-			self._solution = results['soln']
+			self._solution = results['solution']
 			if 'max' in results.keys():
 				self.maxQSize.setText( '{}'.format(results['max']))
 			if 'total' in results.keys():
