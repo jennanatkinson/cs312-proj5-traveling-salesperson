@@ -8,15 +8,11 @@ elif PYQT_VER == 'PYQT4':
 else:
 	raise Exception('Unsupported Version of PyQt: {}'.format(PYQT_VER))
 
-
-
-
 import time
 import numpy as np
 from TSPClasses import *
 import heapq
 import itertools
-
 
 
 class TSPSolver:
@@ -38,21 +34,22 @@ class TSPSolver:
 		algorithm</returns> 
 	'''
 	
-	def defaultRandomTour( self, time_allowance=60.0 ):
+	# Randomly generate route and check validity while under the time range
+	#   Returns the first found solution
+	def defaultRandomTour(self, time_allowance=60.0):
 		results = {}
 		cities = self._scenario.getCities()
-		ncities = len(cities)
 		foundTour = False
 		count = 0
 		bssf = None
 		start_time = time.time()
-		while not foundTour and time.time()-start_time < time_allowance:
+		while not foundTour and time.time() - start_time < time_allowance:
 			# create a random permutation
-			perm = np.random.permutation( ncities )
+			perm = np.random.permutation(len(cities))
 			route = []
 			# Now build the route using the random permutation
-			for i in range( ncities ):
-				route.append( cities[ perm[i] ] )
+			for i in range(len(cities)):
+				route.append(cities[perm[i]])
 			bssf = TSPSolution(route)
 			count += 1
 			if bssf.cost < np.inf:
@@ -81,8 +78,62 @@ class TSPSolver:
 		algorithm</returns> 
 	'''
 
-	def greedy( self,time_allowance=60.0 ):
-		pass
+	def greedy(self, time_allowance=60.0, startCity=None):
+		# Setup objects
+		results = {}
+		cities = self._scenario.getCities()
+		foundTour = False
+		count = 0
+		bssf = None
+		start_time = time.time()
+		if startCity == None:
+			startCity = random.choice(cities)
+		
+		while not foundTour and time.time() - start_time < time_allowance:
+			# print(f"\nGreedy Tour: Round {count}")
+			# print(f"Starting at {startCity._name}")
+			unvisitedCitiesSet = set(cities)
+			visitedCitiesSet = {startCity}
+			route = [startCity]
+			currentCity = startCity
+
+			# Build the route greedily
+			for _ in range(len(cities)):
+				greedyCost, nextCity = None, None
+				# Iterate to find the smallest unvisited edge
+				for unvisitedCity in unvisitedCitiesSet:
+					cost = currentCity.costTo(unvisitedCity)
+					# Save the smallest city (or any city, if none have been visited)
+					if greedyCost == None or cost < greedyCost:
+						greedyCost, nextCity = cost, unvisitedCity
+
+				# Visit the smallest edge
+				if nextCity != None:
+					# print(f"visit {nextCity._name}, cost ${greedyCost}")
+					visitedCitiesSet.add(nextCity)
+					unvisitedCitiesSet.remove(nextCity)
+					route.append(nextCity)
+					currentCity = nextCity
+				else:
+					raise Exception("Unable to visit any city!!")
+			
+			bssf = TSPSolution(route)
+			count += 1
+			if bssf.cost < np.inf:
+				# Found a valid route
+				foundTour = True
+			else:
+				# Choose a new random city as the start city
+				startCity = random.choice(cities)
+
+		# Return results
+		end_time = time.time()
+		results['cost'] = bssf.cost if foundTour else math.inf
+		results['time'] = end_time - start_time
+		results['count'] = count
+		results['soln'] = bssf
+		results['max'], results['total'], results['pruned'] = None, None, None
+		return results
 	
 	
 	
@@ -95,7 +146,7 @@ class TSPSolver:
 		max queue size, total number of states created, and number of pruned states.</returns> 
 	'''
 		
-	def branchAndBound( self, time_allowance=60.0 ):
+	def branchAndBound(self, time_allowance=60.0):
 		pass
 
 
@@ -109,9 +160,5 @@ class TSPSolver:
 		algorithm</returns> 
 	'''
 		
-	def fancy( self,time_allowance=60.0 ):
+	def fancy(self,time_allowance=60.0):
 		pass
-		
-
-
-
