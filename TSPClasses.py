@@ -64,6 +64,7 @@ class Scenario:
 			self._cities = [City( pt.x(), pt.y() ) for pt in city_locations]
 
 
+		# The city list is ordered by index
 		num = 0
 		for city in self._cities:
 			#if difficulty == "Hard":
@@ -121,13 +122,14 @@ class Scenario:
 
 
 class City:
-	def __init__(self, x, y, elevation=0.0):
+	def __init__(self, x, y, elevation=0., index=-1, name=None, scenario=None, test=False):
 		self._x = x
 		self._y = y
 		self._elevation = elevation
-		self._scenario	= None
-		self._index = -1
-		self._name	= None
+		self._scenario	= scenario
+		self._index = index
+		self._name	= name
+		self.testFlag = test
 
 	def setIndexAndName(self, index, name):
 		self._index = index
@@ -146,6 +148,9 @@ class City:
 	def costTo(self, other_city):
 
 		assert(type(other_city) == City)
+
+		if self.testFlag:
+			return self._scenario[self._index][other_city._index]
 
 		# In hard mode, remove edges; this slows down the calculation...
 		# Use this in all difficulties, it ensures INF for self-edge
