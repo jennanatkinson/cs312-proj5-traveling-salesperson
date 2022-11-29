@@ -105,6 +105,7 @@ def test_visit_city():
   assert(testState.routeSoFar == [cities[0], cities[1]])
   assert(testState.costSoFar == 24)
   assert(testState.isSolution() == False)
+  assert(testState.shouldPrune() == False)
 
   # Visit so route is 0-2-3-1, assert that matrix/cost adjusts
 def test_visit_city_fullRoute():
@@ -115,8 +116,11 @@ def test_visit_city_fullRoute():
                         [math.inf, math.inf, math.inf, math.inf]]
   testState = State(cities=cities)
   testState.visitCity(cities[2])
+  assert(testState.shouldPrune() == False)
   testState.visitCity(cities[3])
+  assert(testState.shouldPrune() == False)
   testState.visitCity(cities[1])
+  assert(testState.shouldPrune() == False)
 
   assert(len(testState.unvisitedCitiesSet) == 0)
   assert_matrix(testState.matrix, correctStateMatrix, len(cities))
@@ -134,6 +138,7 @@ def test_visit_city_fullRoute():
   correctCost = 15
   assert(testState.costSoFar == correctCost)
   assert(testState.isSolution() == True)
+  assert(testState.shouldPrune() == False)
   testFinalRoute, testFinalCost = testState.getSolution()
   assert(testFinalRoute == correctRoute)
   assert(testFinalCost == correctCost)
@@ -163,4 +168,15 @@ def test_state_notSolution():
   assert(testState.cities == cities)
   assert(testState.routeSoFar == [cities[0], cities[2], cities[3], cities[1]])
   assert(testState.costSoFar == math.inf)
+  assert(testState.shouldPrune() == True) # because costSoFar == math.inf
   assert(testState.isSolution() == False)
+
+def test_should_prune_with_bssf():
+  _, _, cities = setup_scenario()
+  correctStateMatrix = [[math.inf, math.inf, math.inf, math.inf],
+                        [math.inf, math.inf, 0, 7],
+                        [0, math.inf, math.inf, 0],
+                        [4, math.inf, 0, math.inf]]
+  testState = State(cities=cities)
+  testState.visitCity(cities[1])
+  assert(testState.shouldPrune(bssf=5) == True)
