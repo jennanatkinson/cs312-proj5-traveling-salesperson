@@ -80,25 +80,26 @@ class State:
 	# or set up a flag??
 
 
+	def _generateTuple(self, rowMajor:bool, i:int, j:int):
+		if rowMajor:
+			return tuple((i, j))
+		else: # Rows and columns are reversed here
+			return tuple((j, i))
+	
 	# Ensures at least one zero on the rows/columns of the matrix (besides inf)
-	# Note: comments/names are the to show rows, but it reverses for columns
-	def findMinCostAndNormalize(self, row:bool=True):
-		# Look at rows to find the minCost
-		for rowIndex in range(len(self.cities)):
-			print(f"RowIndex: {rowIndex}")
-			# If the whole row is going to be infinities, move on
-			if self.isInfinity(self.cities[rowIndex]):
+	def findMinCostAndNormalize(self, rowMajor:bool=True):
+		# Look at row each row/column to find the minCost
+		for i in range(len(self.cities)):
+			print(f"i: {i}")
+			# If the whole row/column is going to be infinities, move on
+			if self.isInfinity(self.cities[i]):
 				continue
 			
 			minCost = math.inf
 
-			#Examine each cell to find the minCost
-			for colIndex in range(len(self.cities)):
-				if row:
-					cell = tuple((rowIndex, colIndex))
-				else: # Rows and columns are reversed here
-					cell = tuple((colIndex, rowIndex))
-				
+			#Examine each cell in a row/column to find the minCost
+			for j in range(len(self.cities)):
+				cell = self._generateTuple(rowMajor, i, j)
 				cost = self.matrix.get(cell)
 				if cost != None and cost < minCost:
 					minCost = cost
@@ -111,11 +112,8 @@ class State:
 				self.costSoFar += minCost
 
 			# Update all costs in same row/column to normalize
-				for colIndex in range(len(self.cities)):
-					if row:
-						cell = tuple((rowIndex, colIndex))
-					else: # Rows and columns are reversed here
-						cell = tuple((colIndex, rowIndex))
+				for j in range(len(self.cities)):
+					cell = self._generateTuple(rowMajor, i, j)
 					cost = self.matrix.get(cell)
 					# If not infinity, update cell's cost
 					if cost != None:
@@ -125,8 +123,8 @@ class State:
 	# Ensures at least one zero on the rows and columns of the matrix (besides inf)
 	# Adjusts costSoFar as needed
 	def reduceCostOnMatrix(self):
-		self.findMinCostAndNormalize(row=True)
-		self.findMinCostAndNormalize(row=False)
+		self.findMinCostAndNormalize(rowMajor=True)
+		self.findMinCostAndNormalize(rowMajor=False)
 
 	# Marks the city as visited, updates the matrix and then does reduceCost to normalize the matrix again
 	def visitCity(self, cityToVisit:City):
