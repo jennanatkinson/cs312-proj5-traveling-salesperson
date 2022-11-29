@@ -11,15 +11,12 @@ else:
 import time
 import numpy as np
 from TSPClasses import *
-import heapq
-import itertools
-
 
 class TSPSolver:
-	def __init__( self, gui_view ):
+	def __init__( self, gui_view=None ):
 		self._scenario = None
 
-	def setupWithScenario( self, scenario ):
+	def setupWithScenario( self, scenario:Scenario):
 		self._scenario = scenario
 
 
@@ -59,7 +56,7 @@ class TSPSolver:
 		results['cost'] = bssf.cost if foundTour else math.inf
 		results['time'] = end_time - start_time
 		results['count'] = count
-		results['soln'] = bssf
+		results['solution'] = bssf
 		results['max'] = None
 		results['total'] = None
 		results['pruned'] = None
@@ -93,7 +90,7 @@ class TSPSolver:
 			# print(f"\nGreedy Tour: Round {count}")
 			# print(f"Starting at {startCity._name}")
 			unvisitedCitiesSet = set(cities)
-			visitedCitiesSet = {startCity}
+			# visitedCitiesSet = {startCity}
 			route = [startCity]
 			currentCity = startCity
 
@@ -110,7 +107,7 @@ class TSPSolver:
 				# Visit the smallest edge
 				if nextCity != None:
 					# print(f"visit {nextCity._name}, cost ${greedyCost}")
-					visitedCitiesSet.add(nextCity)
+					# visitedCitiesSet.add(nextCity)
 					unvisitedCitiesSet.remove(nextCity)
 					route.append(nextCity)
 					currentCity = nextCity
@@ -131,7 +128,7 @@ class TSPSolver:
 		results['cost'] = bssf.cost if foundTour else math.inf
 		results['time'] = end_time - start_time
 		results['count'] = count
-		results['soln'] = bssf
+		results['solution'] = bssf
 		results['max'], results['total'], results['pruned'] = None, None, None
 		return results
 	
