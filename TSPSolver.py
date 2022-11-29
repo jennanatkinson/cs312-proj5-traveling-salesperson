@@ -38,7 +38,7 @@ class TSPSolver:
 		cities = self._scenario.getCities()
 		foundTour = False
 		count = 0
-		bssf = None
+		solution = None
 		start_time = time.time()
 		while not foundTour and time.time() - start_time < time_allowance:
 			# create a random permutation
@@ -47,16 +47,16 @@ class TSPSolver:
 			# Now build the route using the random permutation
 			for i in range(len(cities)):
 				route.append(cities[perm[i]])
-			bssf = TSPSolution(route)
+			solution = TSPSolution(route)
 			count += 1
-			if bssf.cost < np.inf:
+			if solution.cost < np.inf:
 				# Found a valid route
 				foundTour = True
 		end_time = time.time()
-		results['cost'] = bssf.cost if foundTour else math.inf
+		results['cost'] = solution.cost if foundTour else math.inf
 		results['time'] = end_time - start_time
 		results['count'] = count
-		results['solution'] = bssf
+		results['solution'] = solution
 		results['max'] = None
 		results['total'] = None
 		results['pruned'] = None
@@ -75,22 +75,20 @@ class TSPSolver:
 		algorithm</returns> 
 	'''
 
+	# Returns the first greedy solution found
 	def greedy(self, time_allowance=60.0, startCity=None):
 		# Setup objects
 		results = {}
 		cities = self._scenario.getCities()
 		foundTour = False
 		count = 0
-		bssf = None
+		solution = None
 		start_time = time.time()
 		if startCity == None:
-			startCity = random.choice(cities)
+			startCity = cities[0]
 		
 		while not foundTour and time.time() - start_time < time_allowance:
-			# print(f"\nGreedy Tour: Round {count}")
-			# print(f"Starting at {startCity._name}")
 			unvisitedCitiesSet = set(cities)
-			# visitedCitiesSet = {startCity}
 			route = []
 			currentCity = startCity
 
@@ -106,30 +104,27 @@ class TSPSolver:
 
 				# Visit the smallest edge
 				if nextCity != None:
-					# print(f"visit {nextCity._name}, cost ${greedyCost}")
-					# visitedCitiesSet.add(nextCity)
 					unvisitedCitiesSet.remove(nextCity)
 					route.append(nextCity)
 					currentCity = nextCity
 				else:
 					raise Exception("Unable to visit any city!!")
 			
-			# TODO: need to have it go back to the start city??
-			bssf = TSPSolution(route)
+			solution = TSPSolution(route)
 			count += 1
-			if bssf.cost < np.inf:
+			if solution.cost < np.inf:
 				# Found a valid route
 				foundTour = True
 			else:
-				# Choose a new random city as the start city
+				# Choose a new random city as the start city and try again
 				startCity = random.choice(cities)
 
 		# Return results
 		end_time = time.time()
-		results['cost'] = bssf.cost if foundTour else math.inf
+		results['cost'] = solution.cost if foundTour else math.inf
 		results['time'] = end_time - start_time
 		results['count'] = count
-		results['solution'] = bssf
+		results['solution'] = solution
 		results['max'], results['total'], results['pruned'] = None, None, None
 		return results
 	
