@@ -1,6 +1,7 @@
 import math
 
 from TSPClasses import City
+from copy import copy, deepcopy
 
 
 INF_STRING = "-"
@@ -24,7 +25,7 @@ class State:
 	def __init__(self, unvisitedSet:set=set(), matrix:dict=dict(), cities:list[City]=[], route:list=[], costSoFar:int=0):
 		self.unvisitedCitiesSet:set = unvisitedSet
 		self.matrix:dict = matrix
-		self.cities:list[City] = cities
+		self.cities:list[City] = cities # should be readOnly
 		self.routeSoFar:list[City] = route
 		self.costSoFar:int = costSoFar
 		self._isReturnVisitToStart:bool = False # should ONLY be updated if len(unvisitedSet) == 0
@@ -180,7 +181,7 @@ class State:
 			assert(len(self.matrix) == 0)
 			self._isReturnVisitToStart = True
 		else:
-			self.unvisitedCitiesSet.remove(cityToVisit)
+			self.unvisitedCitiesSet.discard(cityToVisit)
 			self.routeSoFar.append(cityToVisit)
 			self.reduceCostOnMatrix()
 			
