@@ -89,7 +89,7 @@ class TSPSolver:
 		while not foundTour and time.time() - start_time < time_allowance:
 			# print(f"\nGreedy Tour: Round {count}")
 			# print(f"Starting at {startCity._name}")
-			unvisitedCitiesSet = set(cities)
+			unvisitedCitiesSet = set(cities[1:])
 			# visitedCitiesSet = {startCity}
 			route = [startCity]
 			currentCity = startCity
@@ -114,6 +114,7 @@ class TSPSolver:
 				else:
 					raise Exception("Unable to visit any city!!")
 			
+			# TODO: need to have it go back to the start city
 			bssf = TSPSolution(route)
 			count += 1
 			if bssf.cost < np.inf:

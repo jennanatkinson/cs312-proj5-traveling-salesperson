@@ -4,7 +4,7 @@ import signal
 import sys
 import time
 from Proj5GUI import Proj5GUI
-from TSPBranchAndBound import State, generateRootStateFromCities
+from TSPBranchAndBound import State
 from TSPClasses import City, Scenario
 
 
@@ -42,14 +42,13 @@ else:
 #   w.generateNetwork()
 #   w.solver.setupWithScenario(w._scenario)
 
-# Verifies that the initial State is set up correctly, with the matrix normalized and the costSoFar correct
-# (reference Homework 19)
-def test_init_state():
-  pass
+# Sets up matrix from Homework 19
+def setup_scenario():
+  # 2D-Arrays are used for ease of testing (a dict is used for State's matrix)
   scenario = [[math.inf, 7, 3, 12],
-              [3, math.inf, 6, 14],
-              [5, 8, math.inf, 6],
-              [9, 3, 5, math.inf]]
+            [3, math.inf, 6, 14],
+            [5, 8, math.inf, 6],
+            [9, 3, 5, math.inf]]
   
   correctStateMatrix = [[math.inf, 4, 0, 8],
                         [0, math.inf, 3, 10],
@@ -62,26 +61,44 @@ def test_init_state():
   city3 = City(None, None, scenario=scenario, index=2, name='C', test=True)
   city4 = City(None, None, scenario=scenario, index=3, name='D', test=True)
   cities = [city1, city2, city3, city4]
-  
-  testState = generateRootStateFromCities(cities)
 
-  assert(len(testState.unvisitedCitiesSet) == len(cities))
+  return scenario, correctStateMatrix, cities
 
-  # Assert that the matrix is equal at each value
-  for i in range(len(cities)):
-    for j in range(len(cities)):
-      correctCost = correctStateMatrix[i][j]
+# Assert that the dictionaries values are equal to the matrix's values
+def assert_matrix(testMatrixDict, correctMatrixArr, len):
+  for i in range(len):
+    for j in range(len):
+      correctCost = correctMatrixArr[i][j]
       if correctCost == math.inf:
-        assert(testState.matrix.get(tuple((i, j))) == None)
+        assert(testMatrixDict.get(tuple((i, j))) == None)
       else:
-        assert(testState.matrix.get(tuple((i, j))) == correctCost)
+        assert(testMatrixDict.get(tuple((i, j))) == correctCost)
 
+# Verifies that the initial State is set up correctly, with the matrix normalized and the costSoFar correct
+def test_init_state():
+  _, correctStateMatrix, cities = setup_scenario()
+  testState = State(cities=cities)
+  print(testState)
+  assert(len(testState.unvisitedCitiesSet) == len(cities)-1)
+  #assert_matrix(testState.matrix, correctStateMatrix, len(cities))
   assert(testState.cities == cities)
-  assert(len(testState.routeSoFar) == 0)
+  assert(testState.routeSoFar == [cities[0]])
   assert(testState.costSoFar == 15)
   assert(testState.isSolution() == False)
   
+# Visit one city (B), assert that matrix/cost adjusts
+def test_visit_city():
+  _, _, cities = setup_scenario()
+  correctStateMatrix = [[math.inf, math.inf, math.inf, math.inf],
+                        [math.inf, math.inf, 0, 7],
+                        [0, math.inf, math.inf, 0],
+                        [4, math.inf, 0, math.inf]]
+  testState = State(cities=cities)
+  testState.visitCity(cities[1])
 
-# def setScenario(w:Proj5GUI, points, diff, rand_seed):
-#   w._scenario = Scenario( city_locations=points, difficulty=diff, rand_seed=rand_seed )
-#   pass
+  assert(len(testState.unvisitedCitiesSet) == len(cities)-2)
+  assert_matrix(testState.matrix, correctStateMatrix, len(cities))
+  assert(testState.cities == cities)
+  assert(testState.routeSoFar == [cities[0], cities[1]])
+  assert(testState.costSoFar == 24)
+  assert(testState.isSolution() == False)
