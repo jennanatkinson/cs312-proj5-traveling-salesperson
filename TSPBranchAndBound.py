@@ -51,7 +51,7 @@ class State:
 					if cost != math.inf:
 						matrix[tuple((city._index, otherCity._index))] = cost
 		self.matrix = matrix
-		self.reduceCostOnMatrix()
+		self._reduceCostOnMatrix()
 
 	# Returns true if route is impossible or not going to yield a better result
 	# Should be used if branch is not a solution yet, but trying to determine if we should continue exploring or not
@@ -79,7 +79,7 @@ class State:
 			self.visitCity(self.cities[0])
 
 	# Looks at the matrix and determines if a row or column will be inf (based on visit status)
-	def isInfinity(self, rowMajor:bool, city:City) -> bool:
+	def _isInfinity(self, rowMajor:bool, city:City) -> bool:
 		# If the city has been visited (aka at least an edge inbound or outbound, which is the only way to be inf)
 		if not (city in self.unvisitedCitiesSet):
 			if len(self.routeSoFar) <= 1:
@@ -112,11 +112,11 @@ class State:
 			return tuple((j, i))
 	
 	# Ensures at least one zero on the rows/columns of the matrix (besides inf)
-	def findMinCostAndNormalize(self, rowMajor:bool=True):
+	def _findMinCostAndNormalize(self, rowMajor:bool=True):
 		# Look at row each row/column to find the minCost
 		for i in range(len(self.cities)):
 			# If the whole row/column is going to be infinities, move on
-			if self.isInfinity(rowMajor, self.cities[i]):
+			if self._isInfinity(rowMajor, self.cities[i]):
 				continue
 			
 			minCost = math.inf
@@ -145,9 +145,9 @@ class State:
 
 	# Ensures at least one zero on the rows and columns of the matrix (besides inf)
 	# Adjusts costSoFar as needed
-	def reduceCostOnMatrix(self):
-		self.findMinCostAndNormalize(rowMajor=True)
-		self.findMinCostAndNormalize(rowMajor=False)
+	def _reduceCostOnMatrix(self):
+		self._findMinCostAndNormalize(rowMajor=True)
+		self._findMinCostAndNormalize(rowMajor=False)
 
 	# Marks the city as visited, updates the matrix and then does reduceCost to normalize the matrix again
 	def visitCity(self, cityToVisit:City):
