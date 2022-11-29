@@ -43,12 +43,15 @@ def test_should_solve_defaultRandom():
 #   w.solver.setupWithScenario(w._scenario)
 
 # Sets up matrix from Homework 19
-def setup_scenario():
+def setup_scenario(givenScenario=None):
+  if givenScenario == None:
   # 2D-Arrays are used for ease of testing (a dict is used for State's matrix)
-  scenario = [[math.inf, 7, 3, 12],
-            [3, math.inf, 6, 14],
-            [5, 8, math.inf, 6],
-            [9, 3, 5, math.inf]]
+    scenario = [[math.inf, 7, 3, 12],
+              [3, math.inf, 6, 14],
+              [5, 8, math.inf, 6],
+              [9, 3, 5, math.inf]]
+  else:
+    scenario = givenScenario
   
   correctStateMatrix = [[math.inf, 4, 0, 8],
                         [0, math.inf, 3, 10],
@@ -101,4 +104,63 @@ def test_visit_city():
   assert(testState.cities == cities)
   assert(testState.routeSoFar == [cities[0], cities[1]])
   assert(testState.costSoFar == 24)
+  assert(testState.isSolution() == False)
+
+  # Visit so route is 0-2-3-1, assert that matrix/cost adjusts
+def test_visit_city_fullRoute():
+  _, _, cities = setup_scenario()
+  correctStateMatrix = [[math.inf, math.inf, math.inf, math.inf],
+                        [0, math.inf, math.inf, math.inf],
+                        [math.inf, math.inf, math.inf, math.inf],
+                        [math.inf, math.inf, math.inf, math.inf]]
+  testState = State(cities=cities)
+  testState.visitCity(cities[2])
+  testState.visitCity(cities[3])
+  testState.visitCity(cities[1])
+
+  assert(len(testState.unvisitedCitiesSet) == 0)
+  assert_matrix(testState.matrix, correctStateMatrix, len(cities))
+  assert(testState.cities == cities)
+  assert(testState.routeSoFar == [cities[0], cities[2], cities[3], cities[1]])
+  assert(testState.costSoFar == 15)
+  assert(testState.isSolution() == False)
+
+  testState.visitCity(cities[0])
+  assert(len(testState.unvisitedCitiesSet) == 0)
+  assert(len(testState.matrix) == 0)
+  assert(testState.cities == cities)
+  correctRoute = [cities[0], cities[2], cities[3], cities[1]]
+  assert(testState.routeSoFar == correctRoute)
+  correctCost = 15
+  assert(testState.costSoFar == correctCost)
+  assert(testState.isSolution() == True)
+  testFinalRoute, testFinalCost = testState.getSolution()
+  assert(testFinalRoute == correctRoute)
+  assert(testFinalCost == correctCost)
+
+# Test where visiting the final city still does not yield a solution
+def test_state_notSolution():
+  scenario = [[math.inf, 7, 3, 12],
+              [math.inf, math.inf, 6, 14],
+              [5, 8, math.inf, 6],
+              [9, 3, 5, math.inf]]
+  _, _, cities = setup_scenario(scenario)
+  # correctStateMatrix = [[math.inf, math.inf, math.inf, math.inf],
+  #                       [math.inf, math.inf, math.inf, math.inf],
+  #                       [math.inf, math.inf, math.inf, math.inf],
+  #                       [math.inf, math.inf, math.inf, math.inf]]
+  testState = State(cities=cities)
+  testState.visitCity(cities[2])
+  assert(testState.isSolution() == False)
+  testState.visitCity(cities[3])
+  assert(testState.isSolution() == False)
+  testState.visitCity(cities[1])
+  assert(testState.isSolution() == False)
+
+  testState.visitCity(cities[0])
+  assert(len(testState.unvisitedCitiesSet) == 0)
+  assert(len(testState.matrix) == 0)
+  assert(testState.cities == cities)
+  assert(testState.routeSoFar == [cities[0], cities[2], cities[3], cities[1]])
+  assert(testState.costSoFar == math.inf)
   assert(testState.isSolution() == False)
