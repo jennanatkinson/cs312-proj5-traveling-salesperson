@@ -193,22 +193,31 @@ class State:
 				setattr(result, k, deepcopy(v, memo))
 		return result
 
-	def __str__(self) -> str:
+	def str_routeSoFar(self):
 		string = "State{"
 		if len(self.routeSoFar) != 0:
 			for city in self.routeSoFar:
 				string += f"{city._name}->"
 		else:
 			string += "*empty*"
-		string += f"}}\nCost so far: {self.costSoFar}\n"
+		string += "}\n"
+		return string
+	
+	def str_costSoFar(self):
+		return f"Cost so far: {self.costSoFar}\n"
+	
+	def str_unvisitedCitiesSet(self):
 		string += "Unvisited Cities: "
 		if len(self.unvisitedCitiesSet) != 0:
 			for city in self.unvisitedCitiesSet:
 				string += f"{city._name} "
 		else:
 			string += "*empty*"
-
-		string += '\nMatrix:\n'
+		string += '\n'
+		return string
+	
+	def str_matrix(self):
+		string += 'Matrix:\n'
 		# Format the matrix printing
 		table_data = [[]]
 		# Print the names of the cities at the top
@@ -244,4 +253,9 @@ class State:
 			string += '\n'
 		string += '\n'
 
+	def __str__(self) -> str:
+		string = self.str_routeSoFar()
+		string += self.str_costSoFar()
+		string += self.str_unvisitedCitiesSet()
+		string += self.str_matrix()
 		return string
