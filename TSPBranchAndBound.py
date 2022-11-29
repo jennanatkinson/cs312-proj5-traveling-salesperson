@@ -5,7 +5,13 @@ from TSPClasses import City
 
 INF_STRING = "-"
 
-# TODO: should prune if the column of 0 is all inf, should prune if the lower bound is bigger than the bssf
+class PriorityEntry(object):
+	def __init__(self, priority, data):
+			self.data = data
+			self.priority = priority
+
+	def __lt__(self, other):
+			return self.priority < other.priority
 
 # Keeps track/adjusts the current route, matrix and cost when adding new cities to the route
 class State:
