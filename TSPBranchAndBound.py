@@ -27,7 +27,7 @@ class State:
 		if len(cities) != 0 and costSoFar == 0 and len(matrix) == 0 and len(unvisitedSet) == 0 and len(route) == 0:
 			self._generateRootStateFromCities()
 
-	# Given a list of cities, return an init state
+	# Given a list of cities, return an init state with the first city as the start
 	def _generateRootStateFromCities(self):
 		# Unvisited cities should exclude the start node, so it is not revisited before the end
 		self.unvisitedCitiesSet = set(self.cities[1:])
