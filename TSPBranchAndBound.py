@@ -20,7 +20,6 @@ def generateRootStateFromCities(cities):
 					matrix[tuple((city._index, otherCity._index))] = cost
 	state.matrix = matrix
 	state.reduceCostOnMatrix()
-	print(state.matrix)
 	return state
 
 class State:
@@ -49,23 +48,6 @@ class State:
 
 	def isVisitedCity(self, city:City) -> bool:
 		return not (city in self.unvisitedCitiesSet)
-
-	# TODO: Not sure if this will work with the breaking??
-	# def iterateMatrix(self, row:bool, doThing):
-	# # Look at rows to find the minCost
-	# 	for rowIndex in range(len(self.cities)):
-	# 		# If the whole row is going to be infinities, move on
-	# 		if (self.isVisitedCity(self.cities[rowIndex])):
-	# 			continue
-	# 		minCost = math.inf
-	# 		for colIndex in range(len(self.cities)):
-	# 			if row:
-	# 				cell = tuple((self.cities[rowIndex], self.cities[colIndex]))
-	# 			else: # Rows and columns are reversed here
-	# 				cell = tuple((self.cities[colIndex], self.cities[rowIndex]))
-	# 			cost = self.matrix.get(cell)
-	# 			if cost != None:
-	# 				doThing(minCost)
 
 	# Ensures at least one zero on the rows/columns of the matrix (besides inf)
 	# Note: comments/names are the to show rows, but it reverses for columns
@@ -111,7 +93,6 @@ class State:
 	def reduceCostOnMatrix(self):
 		self.findMinCostAndNormalize(row=True)
 		self.findMinCostAndNormalize(row=False)
-		print(self.matrix)
 
 	# Marks the city as visited, updates the matrix and then does reduceCost to normalize the matrix again
 	def visitCity(self, prevCity:City, cityToVisit:City):
@@ -135,21 +116,26 @@ class State:
 		self.reduceCostOnMatrix()
 
 	def __str__(self) -> str:
-		string = "RouteSoFar:"
-		for city in self.routeSoFar:
-			string += f" -> {city._name}({city._index})"
+		string = "**STATE**\n"
+		string += f"Cost so far (lower bound): {self.costSoFar}\n"
+		string += "RouteSoFar: "
+		if len(self.routeSoFar) != 0:
+			for city in self.routeSoFar:
+				string += f" -> {city._name}({city._index})"
+		else:
+			string += "*empty*"
 		string += "\nUnvisited Nodes: "
 		if len(self.unvisitedCitiesSet) != 0:
 			for city in self.unvisitedCitiesSet:
 				string += f"{city._name}({city._index}) "
-			# string += '\n'
 		else:
-			string += "*empty*\n"
+			string += "*empty*"
 
+		string += '\nMatrix:\n'
 		# Format the matrix printing
 		table_data = [[]]
 		# Print the names of the cities at the top
-		for colIndex in range(-1, len(self.cities)-1):
+		for colIndex in range(-1, len(self.cities)):
 			if colIndex == -1:
 				table_data[0].append(" ")
 			else:
@@ -159,7 +145,7 @@ class State:
 		for colIndex in range(0, len(self.cities)):
 			table_data.append([])
 			last = len(table_data)-1
-			for rowIndex in range(-1, len(self.cities)-1):
+			for rowIndex in range(-1, len(self.cities)):
 				# Append the name of the city for the row
 				if rowIndex == -1:
 					table_data[last].append(self.cities[colIndex]._name)
