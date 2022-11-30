@@ -80,7 +80,7 @@ class State:
 	# This will update the matrix and costSoFar if this is impossible
 	def _tryReturnToStart(self):
 		if self._isReturnVisitToStart: return
-		if len(self.unvisitedCitiesSet) == 0 and self.costSoFar != math.inf and len(self.matrix) == 0:
+		if len(self.unvisitedCitiesSet) == 0 and self.costSoFar != math.inf:
 			self.visitCity(self.cities[0])
 
 	# Looks at the matrix and determines if a row or column will be inf (based on visit status)
@@ -164,7 +164,7 @@ class State:
 		# Ensure that there is actually a path to the other city
 		cost = self.matrix.get(tuple((prevCity._index, cityToVisit._index)))
 		if cost == None:
-			self.costSoFar = math.inf #TODO: maybe change?
+			self.costSoFar = math.inf
 			return
 		# Update cost after traveling to city
 		self.costSoFar += cost
@@ -186,8 +186,10 @@ class State:
 			assert(len(self.matrix) == 0)
 			self._isReturnVisitToStart = True
 		else:
-			self.unvisitedCitiesSet.discard(cityToVisit)
+			self.unvisitedCitiesSet.remove(cityToVisit)
 			self.routeSoFar.append(cityToVisit)
+			self._reduceCostOnMatrix()
+	
 	def copy(self):
 		result = State()
 		result.unvisitedCitiesSet:set = set(self.unvisitedCitiesSet)
@@ -205,7 +207,8 @@ class State:
 				string += f"{city._name}->"
 		else:
 			string += "*empty*"
-		string += "}\n"
+		string = string[:-2]
+		string += "}"
 		return string
 	
 	def str_costSoFar(self):
@@ -259,7 +262,7 @@ class State:
 		string += '\n'
 
 	def __str__(self) -> str:
-		string = self.str_routeSoFar()
+		string = self.str_routeSoFar() + '\n'
 		string += self.str_costSoFar()
 		string += self.str_unvisitedCitiesSet()
 		string += self.str_matrix()
