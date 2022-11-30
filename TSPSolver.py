@@ -156,10 +156,10 @@ class TSPSolver:
 		if bssf == None:
 			greedyResult = self.greedy(time_allowance=time_allowance-(time.time() - start_time))
 			bssf:TSPSolution = greedyResult['solution']
-			count = greedyResult['count']
+			# count = greedyResult['count']
 			print(f"({'{: >5}'.format(round(time.time() - start_time, 2))}s)  BSSF:{bssf}")
-		else:
-			count = givenBssf.count
+		# else:
+		# 	count = givenBssf.count
 
 		# Priority queue of (priorityNum, State) (Note: anything on the queue is NOT a solution yet)
 		pQueue = PriorityQueue() 
