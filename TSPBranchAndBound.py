@@ -260,6 +260,7 @@ class State:
 				string += formatString.format(item)
 			string += '\n'
 		string += '\n'
+		return string
 
 	def __str__(self) -> str:
 		string = self.str_routeSoFar() + '\n'
