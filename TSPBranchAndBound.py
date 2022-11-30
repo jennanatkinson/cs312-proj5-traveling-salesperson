@@ -215,7 +215,7 @@ class State:
 		return f"Cost so far: {self.costSoFar}\n"
 	
 	def str_unvisitedCitiesSet(self):
-		string += "Unvisited Cities: "
+		string = "Unvisited Cities: "
 		if len(self.unvisitedCitiesSet) != 0:
 			for city in self.unvisitedCitiesSet:
 				string += f"{city._name} "
@@ -225,7 +225,7 @@ class State:
 		return string
 	
 	def str_matrix(self):
-		string += 'Matrix:\n'
+		string = 'Matrix:\n'
 		# Format the matrix printing
 		table_data = [[]]
 		# Print the names of the cities at the top
