@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+from queue import PriorityQueue
+from TSPBranchAndBound import PriorityEntry, State
 from which_pyqt import PYQT_VER
 if PYQT_VER == 'PYQT5':
 	from PyQt5.QtCore import QLineF, QPointF
@@ -138,9 +140,77 @@ class TSPSolver:
 		not include the initial BSSF), the best solution found, and three more ints: 
 		max queue size, total number of states created, and number of pruned states.</returns> 
 	'''
+
+	# Continues searching for a better solution until the time runs out or the queue is empty
+	def branchAndBound(self, time_allowance=60.0, givenBssf=None):
+		print("**Branch and Bound**")
+		# Setup objects
+		results:object = {}
+		cities:list[City] = self._scenario.getCities()
+		bssf:TSPSolution = givenBssf
+		start_time:float = time.time()
+		rootState:State = State(cities=cities)
+		count:int = 0
 		
-	def branchAndBound(self, time_allowance=60.0):
-		pass
+		# Start with a greedy solution as the bssf
+		if bssf == None:
+			greedyResult = self.greedy(time_allowance=time_allowance-(time.time() - start_time))
+			bssf:TSPSolution = greedyResult['solution']
+			count = greedyResult['count']
+			print(f"({'{: >5}'.format(round(time.time() - start_time, 2))}s)  BSSF:{bssf}")
+		else:
+			count = givenBssf.count
+
+		# Priority queue of (priorityNum, State) (Note: anything on the queue is NOT a solution yet)
+		pQueue = PriorityQueue() 
+		pQueue.put(PriorityEntry(0, 0, rootState))
+		maxQueueLen:int = 1
+		totalStatesCreated:int = 1
+		totalStatesPruned:int = 0
+
+		# Continue searching and expanding states on the queue until time is up or nothing is left
+		while pQueue.qsize() != 0 and time.time() - start_time < time_allowance:
+			state:State = pQueue.get().data
+			# print(state.str_routeSoFar())
+			# Expand and evaluate "children" aka a next possible unvisitedCity
+			for nextCity in state.unvisitedCitiesSet:
+				childState = state.copy()
+				totalStatesCreated += 1
+				childState.visitCity(nextCity)
+				# print(f"    Child:{childState.str_routeSoFar()}", end="")
+				# See if there is a solution yet
+				route, cost = childState.getSolution()
+				# If this is not a valid solution yet,
+				if route == None or cost == None:
+					if not childState.shouldPrune(bssf.cost):
+						# Prioritize state and put back on the queue
+						pQueue.put(PriorityEntry(len(childState.cities)-len(childState.unvisitedCitiesSet), childState.costSoFar, childState))
+						# print(f": added to queue")
+						if pQueue.qsize() > maxQueueLen:
+							maxQueueLen = pQueue.qsize()
+					# If it should be pruned, it does not go back on the queue
+					else:
+						# print(f": pruned")
+						totalStatesPruned += 1
+						del childState
+				# If it is a solution, then see if it is better than bssf
+				else:
+					solution = TSPSolution(route)
+					print(f"({'{: >5}'.format(round(time.time() - start_time, 2))}s)  BranchAndBound:{solution}")
+					count += 1
+					if solution.cost < bssf.cost:
+						bssf = solution
+
+		# Return results
+		end_time = time.time()
+		results['cost'] = bssf.cost
+		results['time'] = end_time - start_time
+		results['count'] = count
+		results['solution'] = bssf
+		results['max'] = maxQueueLen
+		results['total'] = totalStatesCreated
+		results['pruned'] = totalStatesPruned
+		return results
 
 
 
