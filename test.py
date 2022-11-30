@@ -1,8 +1,6 @@
 import math
-import random
 import signal
 import sys
-import time
 from Proj5GUI import Proj5GUI
 from TSPBranchAndBound import State
 from TSPClasses import City, Scenario
@@ -59,10 +57,10 @@ def setup_scenario(givenScenario=None):
                         [6, 0, 2, math.inf]]
   
   # Because test is set to true, the cities will return the cost at an index of the double array
-  city1 = City(None, None, scenario=scenario, index=0, name='A', test=True)
-  city2 = City(None, None, scenario=scenario, index=1, name='B', test=True)
-  city3 = City(None, None, scenario=scenario, index=2, name='C', test=True)
-  city4 = City(None, None, scenario=scenario, index=3, name='D', test=True)
+  city1 = City(None, None, scenario=scenario, index=0, name='A', isTest=True)
+  city2 = City(None, None, scenario=scenario, index=1, name='B', isTest=True)
+  city3 = City(None, None, scenario=scenario, index=2, name='C', isTest=True)
+  city4 = City(None, None, scenario=scenario, index=3, name='D', isTest=True)
   cities = [city1, city2, city3, city4]
 
   return scenario, correctStateMatrix, cities

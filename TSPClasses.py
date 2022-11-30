@@ -122,14 +122,14 @@ class Scenario:
 
 
 class City:
-	def __init__(self, x, y, elevation=0., index=-1, name=None, scenario=None, test=False):
+	def __init__(self, x, y, elevation=0., index=-1, name=None, scenario=None, isTest=False):
 		self._x = x
 		self._y = y
 		self._elevation = elevation
 		self._scenario	= scenario
 		self._index = index
 		self._name	= name
-		self.testFlag = test
+		self.testFlag = isTest
 
 	def setIndexAndName(self, index, name):
 		self._index = index
