@@ -188,14 +188,14 @@ class State:
 		else:
 			self.unvisitedCitiesSet.discard(cityToVisit)
 			self.routeSoFar.append(cityToVisit)
-			self.reduceCostOnMatrix()
-			
-	def __deepcopy__(self, memo):
-		cls = self.__class__
-		result = cls.__new__(cls)
-		memo[id(self)] = result
-		for k, v in self.__dict__.items():
-				setattr(result, k, deepcopy(v, memo))
+	def copy(self):
+		result = State()
+		result.unvisitedCitiesSet:set = set(self.unvisitedCitiesSet)
+		result.matrix:dict = dict(self.matrix)
+		result.cities:list[City] = self.cities
+		result.routeSoFar:list[City] = copy(self.routeSoFar)
+		result.costSoFar:int = self.costSoFar
+		result._isReturnVisitToStart:bool = self._isReturnVisitToStart
 		return result
 
 	def str_routeSoFar(self):
