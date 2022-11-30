@@ -7,12 +7,17 @@ from copy import copy, deepcopy
 INF_STRING = "-"
 
 class PriorityEntry(object):
-	def __init__(self, priority, data):
+	def __init__(self, numVisited:int, costSoFar:int, data):
 			self.data = data
-			self.priority = priority
+			# Negative so the biggerNum will be sorted first (reverse pQueue)
+			# self.numVisited:int = -abs(numVisited)
+			self.numVisited:int = numVisited
+			self.costSoFar:int = costSoFar
 
-	def __lt__(self, other):
-			return self.priority < other.priority
+	def __lt__(self, other): #less than
+			if self.numVisited == other.numVisited:
+				return self.costSoFar < other.costSoFar
+			return self.numVisited > other.numVisited
 
 # Keeps track/adjusts the current route, matrix and cost when adding new cities to the route
 class State:
