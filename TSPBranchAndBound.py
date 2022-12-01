@@ -34,9 +34,9 @@ class State:
 
 		# If given nothing but a list of cities, construct the root state
 		if len(cities) != 0 and costSoFar == 0 and len(matrix) == 0 and len(unvisitedSet) == 0 and len(route) == 0:
-			self._generateRootStateFromCities()
+			self._generateRootStateFromCities() # Time: O(n**2)
 
-	# Given a list of cities, return an init state with the first city as the start
+	# Given a list of cities, return an init state with the first city as the start, Time: O(n**2)
 	def _generateRootStateFromCities(self):
 		# Unvisited cities should exclude the start node, so it is not revisited before the end
 		self.unvisitedCitiesSet = set(self.cities[1:])
@@ -53,7 +53,7 @@ class State:
 					if cost != math.inf:
 						matrix[tuple((city._index, otherCity._index))] = cost
 		self.matrix = matrix
-		self._reduceCostOnMatrix()
+		self._reduceCostOnMatrix() # Time: O(n**2)
 
 	# Returns true if route is impossible or not going to yield a better result, Time: O(1)
 	# Should be used if branch is not a solution yet, but trying to determine if we should continue exploring or not
