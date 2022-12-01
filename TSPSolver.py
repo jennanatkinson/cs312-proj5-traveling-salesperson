@@ -77,7 +77,7 @@ class TSPSolver:
 		algorithm</returns> 
 	'''
 
-	# Returns the first greedy solution found
+	# Returns the first greedy solution found, Time: O(x*n**2)
 	def greedy(self, time_allowance=60.0, startCity=None):
 		# Setup objects
 		results = {}
@@ -89,22 +89,23 @@ class TSPSolver:
 		if startCity == None:
 			startCity = cities[0]
 		
+		# Time: O(x*n**2)
 		while not foundTour and time.time() - start_time < time_allowance:
 			unvisitedCitiesSet = set(cities)
 			route = []
 			currentCity = startCity
 
-			# Build the route greedily
+			# Build the route greedily, Time: O(n**2)
 			for _ in range(len(cities)):
 				greedyCost, nextCity = None, None
-				# Iterate to find the smallest unvisited edge
+				# Iterate to find the smallest unvisited edge, Time: O(n)
 				for unvisitedCity in unvisitedCitiesSet:
 					cost = currentCity.costTo(unvisitedCity)
 					# Save the smallest city (or any city, if none have been visited)
 					if greedyCost == None or cost < greedyCost:
 						greedyCost, nextCity = cost, unvisitedCity
 
-				# Visit the smallest edge
+				# Visit the smallest edge, Time: O(1)
 				if nextCity != None:
 					unvisitedCitiesSet.remove(nextCity)
 					route.append(nextCity)
@@ -141,7 +142,7 @@ class TSPSolver:
 		max queue size, total number of states created, and number of pruned states.</returns> 
 	'''
 
-	# Continues searching for a better solution until the time runs out or the queue is empty
+	# Continues searching for a better solution until the time runs out or the queue is empty, Time: O(qlen*n**3)
 	def branchAndBound(self, time_allowance=60.0, givenBssf=None):
 		print("**Branch and Bound**")
 		# Setup objects
@@ -152,14 +153,11 @@ class TSPSolver:
 		rootState:State = State(cities=cities)
 		count:int = 0
 		
-		# Start with a greedy solution as the bssf
+		# Start with a greedy solution as the bssf, Time: O(x*n**2)
 		if bssf == None:
 			greedyResult = self.greedy(time_allowance=time_allowance-(time.time() - start_time))
 			bssf:TSPSolution = greedyResult['solution']
-			# count = greedyResult['count']
 			print(f"({'{: >5}'.format(round(time.time() - start_time, 2))}s)  BSSF:{bssf}")
-		# else:
-		# 	count = givenBssf.count
 
 		# Priority queue of (priorityNum, State) (Note: anything on the queue is NOT a solution yet)
 		pQueue = PriorityQueue() 
@@ -168,27 +166,28 @@ class TSPSolver:
 		totalStatesCreated:int = 1
 		totalStatesPruned:int = 0
 
-		# Continue searching and expanding states on the queue until time is up or nothing is left
+		# Continue searching and expanding states on the queue until time is up or nothing is left, Time: O(qlen*n**3)
 		while pQueue.qsize() != 0 and time.time() - start_time < time_allowance:
 			state:State = pQueue.get().data
 			# If the bssf has changed between adding to the queue vs coming off, prune it
 			if state.shouldPrune(bssf.cost):
 				totalStatesPruned += 1
+				del state
 				continue
 			# print(state.str_routeSoFar())
 
-			# Expand and evaluate "children" aka a next possible unvisitedCity
+			# Expand and evaluate "children" aka a next possible unvisitedCity, Time: O(n**3)
 			for nextCity in state.unvisitedCitiesSet:
-				childState = state.copy()
+				childState = state.copy() # Time: O(n)
 				totalStatesCreated += 1
-				childState.visitCity(nextCity)
+				childState.visitCity(nextCity) # Time: O(n**2)
 				# print(f"    Child:{childState.str_routeSoFar()}", end="")
 				
 				# See if there is a solution yet
-				route, cost = childState.getSolution()
+				route, cost = childState.getSolution() # Time: O(1)
 				# If this is not a valid solution yet,
 				if route == None or cost == None:
-					if not childState.shouldPrune(bssf.cost):
+					if not childState.shouldPrune(bssf.cost): # Time: O(1)
 						# Prioritize state and put back on the queue
 						pQueue.put(PriorityEntry(len(childState.cities)-len(childState.unvisitedCitiesSet), childState.costSoFar, childState))
 						# print(f": added to queue")
@@ -200,7 +199,7 @@ class TSPSolver:
 						totalStatesPruned += 1
 						del childState
 				
-				# If it is a solution, then see if it is better than bssf
+				# If it is a solution, then see if it is better than bssf, Time: O(1)
 				else:
 					solution = TSPSolution(route)
 					print(f"({'{: >5}'.format(round(time.time() - start_time, 2))}s)  BranchAndBound:{solution}")

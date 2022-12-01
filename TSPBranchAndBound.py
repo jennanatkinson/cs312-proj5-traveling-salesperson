@@ -64,7 +64,7 @@ class State:
 	def isSolution(self) -> bool:
 		return len(self.unvisitedCitiesSet) == 0 and self.costSoFar != math.inf and len(self.matrix) == 0 and self._isReturnVisitToStart
 
-	# Return the route if a solution
+	# Return the route if a solution, Time: O(1)
 	# (will try to return to start if that is possible and hasn't been done yet)
 	def getSolution(self):
 		self._tryReturnToStart()
@@ -73,12 +73,12 @@ class State:
 		else:
 			return None, None
 
-	# If all other nodes have been visited, try to return to the start from the last city (unless already returned)
+	# If all other nodes have been visited, try to return to the start from the last city (unless already returned), Time: O(1)
 	# This will update the matrix and costSoFar if this is impossible
 	def _tryReturnToStart(self):
 		if self._isReturnVisitToStart: return
 		if len(self.unvisitedCitiesSet) == 0 and self.costSoFar != math.inf:
-			self.visitCity(self.cities[0])
+			self.visitCity(self.cities[0]) # Time: O(1) (this will be super fast, bc no reducing)
 
 	# Looks at the matrix and determines if a row or column will be inf (based on visit status), Time: O(1)
 	def _isInfinity(self, rowMajor:bool, city:City) -> bool:
