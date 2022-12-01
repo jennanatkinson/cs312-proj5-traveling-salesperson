@@ -171,13 +171,19 @@ class TSPSolver:
 		# Continue searching and expanding states on the queue until time is up or nothing is left
 		while pQueue.qsize() != 0 and time.time() - start_time < time_allowance:
 			state:State = pQueue.get().data
+			# If the bssf has changed between adding to the queue vs coming off, prune it
+			if state.shouldPrune(bssf.cost):
+				totalStatesPruned += 1
+				continue
 			# print(state.str_routeSoFar())
+
 			# Expand and evaluate "children" aka a next possible unvisitedCity
 			for nextCity in state.unvisitedCitiesSet:
 				childState = state.copy()
 				totalStatesCreated += 1
 				childState.visitCity(nextCity)
 				# print(f"    Child:{childState.str_routeSoFar()}", end="")
+				
 				# See if there is a solution yet
 				route, cost = childState.getSolution()
 				# If this is not a valid solution yet,
@@ -193,6 +199,7 @@ class TSPSolver:
 						# print(f": pruned")
 						totalStatesPruned += 1
 						del childState
+				
 				# If it is a solution, then see if it is better than bssf
 				else:
 					solution = TSPSolution(route)
